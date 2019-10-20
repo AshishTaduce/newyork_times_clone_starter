@@ -21,6 +21,23 @@ class _NewsListPageState extends State<NewsListPage> {
               fontSize: 32, color: Colors.black, fontFamily: 'OldLondon'),
         ),
       ),
+      body: ListView(
+        shrinkWrap: true,
+        children: <Widget>[
+          Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                NewsCard,
+                NewsCard,
+                NewsCard,
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
