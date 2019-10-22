@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'image_page.dart';
+
 
 class DetailsPage extends StatelessWidget {
   final String titleFromHomePage;
@@ -7,12 +9,7 @@ class DetailsPage extends StatelessWidget {
   final DateTime timeFromHomePage;
   final String sourceFromHomePage;
 
-  DetailsPage(
-      {this.descriptionFromHomePage,
-        this.timeFromHomePage,
-        this.titleFromHomePage,
-        this.urlFromHomePage,
-        this.sourceFromHomePage});
+  DetailsPage({this.descriptionFromHomePage,this.timeFromHomePage, this.titleFromHomePage, this.urlFromHomePage, this.sourceFromHomePage});
 
   @override
   Widget build(BuildContext context) {
@@ -38,39 +35,59 @@ class DetailsPage extends StatelessWidget {
         actions: <Widget>[Icon(Icons.more_vert), Icon(Icons.share)],
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(titleFromHomePage,
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22)),
-            Center(
-              child: descriptionFromHomePage != null
-                  ? Text(descriptionFromHomePage)
-                  : Text('No description provided'),
-            ),
-            urlFromHomePage == null
-                ? Image.asset(
-              'assets/defaultimage.png',
-              fit: BoxFit.fitWidth,
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(titleFromHomePage,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                fontFamily: 'NotaSerif'
+              )),
+          Center(
+            child: descriptionFromHomePage != null
+                ? Text(descriptionFromHomePage, style: TextStyle(
+                fontFamily: 'NotaSerif'
+            ),)
+                : Text('No description provided'),
+          ),
+          Hero(
+            tag: '$titleFromHomePage',
+            child:  GestureDetector(
+              onTap: (){
+                Navigator.push(
+                  (context),
+                  MaterialPageRoute(
+                    builder: (context) => PhotoPage(
+                      urlFromHomePage: urlFromHomePage,
+                    ),
+                  ),
+                );
+              },
+              child: urlFromHomePage == null ? Image.asset(
+                'assets/defaultimage.png',
+                fit: BoxFit.cover,
+              ) :
+              Container(
+                child : Image.network(urlFromHomePage, fit: BoxFit.cover,),
+              ),
             )
-                : Image.network(urlFromHomePage),
-            Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
-            Text("By $sourceFromHomePage",
-                style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)),
-            Text(
-              "${timeFromHomePage.day}-${timeFromHomePage.month}-${timeFromHomePage.year}",
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            )
-          ],
-        ),
+          ),
+          Text(
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),
+          Text("By $sourceFromHomePage",
+              style: TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'NotaSerif')),
+          Text(
+            "${timeFromHomePage.day}-${timeFromHomePage.month}-${timeFromHomePage.year}",
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontFamily: 'NotaSerif'),
+          )
+        ],
+      ),
       ),
     );
   }

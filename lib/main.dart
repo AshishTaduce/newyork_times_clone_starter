@@ -32,21 +32,35 @@ class _NewsListPageState extends State<NewsListPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          'Your Times',
-          style: TextStyle(
-              fontSize: 32, color: Colors.black, fontFamily: 'OldLondon'),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            'Your Times',
+            style: TextStyle(
+                fontSize: 32, color: Colors.black, fontFamily: 'OldLondon'),
+          ),
         ),
-      ),
-      body: newsLoaded ?  NewsCardList(newsLoaded, newsMap)
-        : Center(
-    child: CircularProgressIndicator(
-    strokeWidth: 3.0,
-    backgroundColor: Colors.red,
-    ),
-    ),);
+        body: RefreshIndicator(
+          child: newsLoaded
+              ? NewsCardList(newsLoaded, newsMap)
+              : Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3.0,
+                    backgroundColor: Colors.red,
+                  ),
+                ),
+          onRefresh: () {
+            print('refreshing');
+            setState(() {
+              fetchNews();
+              print('refreshed');
+            });
+            dispose();
+            print('disposed');
+            return null;
+          },
+        ));
   }
 }
 
@@ -61,39 +75,41 @@ class NewsCardList extends StatelessWidget {
     return ListView.builder(
       itemBuilder: (context, index) {
         return ListTile(
-          onTap: (){
+          onTap: () {
             Navigator.push(
-                (context),
-                MaterialPageRoute(
-                    builder: (context) => DetailsPage(
-                      descriptionFromHomePage: newsMap['articles'][index]
+              (context),
+              MaterialPageRoute(
+                builder: (context) => DetailsPage(
+                  descriptionFromHomePage: newsMap['articles'][index]
                       ['description'],
-                      titleFromHomePage: newsMap['articles'][index]
-                      ['title'],
-                      urlFromHomePage: newsMap['articles'][index]
-                      ['urlToImage'],
-                      sourceFromHomePage: newsMap['articles'][index]
-                      ['source']['name'],
-                      timeFromHomePage: DateTime.parse(
-                          newsMap['articles'][index]['publishedAt']),
-                    ),),);
+                  titleFromHomePage: newsMap['articles'][index]['title'],
+                  urlFromHomePage: newsMap['articles'][index]['urlToImage'],
+                  sourceFromHomePage: newsMap['articles'][index]['source']
+                      ['name'],
+                  timeFromHomePage:
+                      DateTime.parse(newsMap['articles'][index]['publishedAt']),
+                ),
+              ),
+            );
           },
           title: Container(
-            height: 200,
             width: double.infinity,
             child: Column(
               children: <Widget>[
                 //title
                 Container(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    newsMap['articles'][index]['title'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child: Text(
+                      newsMap['articles'][index]['title'],
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          fontFamily: 'NotaSerif'),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
                   ),
                 ),
                 Row(
@@ -110,6 +126,7 @@ class NewsCardList extends StatelessWidget {
                                   ? Text(
                                       newsMap['articles'][index]['description'],
                                       overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontFamily: 'NotaSerif'),
                                       maxLines: 4,
                                     )
                                   : Text('No description provided'),
@@ -120,11 +137,16 @@ class NewsCardList extends StatelessWidget {
                       flex: 1,
                       child: Container(
                         width: 150,
-                        margin: EdgeInsets.all(12.0),
-                        child: newsMap['articles'][index]['urlToImage'] == null
-                            ? Image.asset('assets/defaultimage.png')
-                            : Image.network(
-                                newsMap['articles'][index]['urlToImage']),
+                        margin: EdgeInsets.all(2.0),
+                        child: Hero(
+                          tag: '${newsMap['articles'][index]['title']}',
+                          child:
+                              newsMap['articles'][index]['urlToImage'] == null
+                                  ? Image.asset('assets/defaultimage.png')
+                                  : Image.network(
+                                      newsMap['articles'][index]['urlToImage'],
+                                    ),
+                        ),
                       ),
                     ),
                   ],
@@ -136,36 +158,51 @@ class NewsCardList extends StatelessWidget {
                       flex: 4,
                       child: Container(
                         alignment: Alignment.topLeft,
-                        child: Row(
-                          children: <Widget>[
-                            Text(newsMap['articles'][index]['source']['name'],
-                                style: TextStyle(color: Colors.grey)),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Text(
-                                  '${DateTime.now().difference(DateTime.parse(newsMap['articles'][index]['publishedAt'])).inHours} hour(s) ago',
-                                  style: TextStyle(color: Colors.grey)),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: EdgeInsets.all(2.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Icon(
-                              Icons.share,
-                              color: Colors.blueGrey,
-                            ),
-                            Icon(
-                              Icons.bookmark_border,
-                              color: Colors.blueGrey,
-                            )
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                      newsMap['articles'][index]['source']
+                                          ['name'],
+                                      style: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'NotaSerif')),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 12),
+                                    child: Text(
+                                      '${DateTime.now().difference(DateTime.parse(newsMap['articles'][index]['publishedAt'])).inHours} hour(s) ago',
+                                      style: TextStyle(
+                                          color: Colors.grey,
+                                          fontFamily: 'NotaSerif'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                margin: EdgeInsets.all(2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.share,
+                                      color: Colors.blueGrey,
+                                    ),
+                                    Icon(
+                                      Icons.bookmark_border,
+                                      color: Colors.blueGrey,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
