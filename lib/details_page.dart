@@ -55,27 +55,25 @@ class DetailsPage extends StatelessWidget {
             ),)
                 : Text('No description provided'),
           ),
-          Hero(
-            tag: '$titleFromHomePage',
-            child:  GestureDetector(
-              onTap: (){
-                Navigator.push(
-                  (context),
-                  MaterialPageRoute(
-                    builder: (context) => PhotoPage(
-                      urlFromHomePage: urlFromHomePage,
-                    ),
+          GestureDetector(
+            onTap: (){
+              Navigator.push(
+                (context),
+                MaterialPageRoute(
+                  builder: (context) => PhotoPage(
+                    urlFromHomePage: urlFromHomePage,
+                    titleFromHomePage: titleFromHomePage,
                   ),
-                );
-              },
-              child: urlFromHomePage == null ? Image.asset(
-                'assets/defaultimage.png',
-                fit: BoxFit.cover,
-              ) :
-              Container(
-                child : Image.network(urlFromHomePage, fit: BoxFit.cover,),
-              ),
-            )
+                ),
+              );
+            },
+            child: urlFromHomePage == null ? Image.asset(
+              'assets/defaultimage.png',
+              fit: BoxFit.cover,
+            ) :
+            Container(
+              child : Image.network(urlFromHomePage, fit: BoxFit.cover,),
+            ),
           ),
           Text(
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'),

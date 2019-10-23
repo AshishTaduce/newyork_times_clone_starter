@@ -3,8 +3,9 @@ import 'package:photo_view/photo_view.dart';
 
 class PhotoPage extends StatelessWidget {
   final urlFromHomePage;
+  final titleFromHomePage;
 
-  PhotoPage({this.urlFromHomePage});
+  PhotoPage({this.urlFromHomePage, this.titleFromHomePage});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
