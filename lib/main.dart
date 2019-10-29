@@ -19,11 +19,12 @@ class _NewsListPageState extends State<NewsListPage> {
   void fetchNews() async {
     newsLoaded = false;
     print('entered FetchNews');
-    newsMap = await networkCall.fetchNewsMap();
+    newsMap = await networkCall.fetchNewsMap('in');
     newsLoaded = true;
     setState(() {});
   }
 
+  NetworkHelper getNews;
   @override
   void initState() {
     fetchNews();
@@ -31,36 +32,58 @@ class _NewsListPageState extends State<NewsListPage> {
   }
 
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          centerTitle: true,
-          title: Text(
-            'Your Times',
-            style: TextStyle(
-                fontSize: 32, color: Colors.black, fontFamily: 'OldLondon'),
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Your Times',
+              style: TextStyle(
+                  fontSize: 32, color: Colors.black, fontFamily: 'OldLondon'),
+            ),
+            bottom: TabBar(
+              labelPadding: EdgeInsets.fromLTRB(7, 0, 7, 12),
+              indicatorColor: Colors.black,
+              labelStyle: TextStyle(color: Colors.grey, fontSize: 18),
+              labelColor: Colors.black,
+              isScrollable: true,
+              onTap: (x) {
+                newsLoaded = false;
+                if (x == 0) getNews = NetworkHelper(countryName: 'in');
+                if (x == 1) getNews = NetworkHelper(countryName: 'au');
+                if (x == 2) getNews = NetworkHelper(countryName: 'us');
+                if (x == 3) getNews = NetworkHelper(countryName: 'eu');
+                if (x == 4) getNews = NetworkHelper(countryName: 'ca');
+                fetchNews();
+                setState(() {});
+              },
+              tabs: <Widget>[
+                Text("India"),
+                Text("Australia"),
+                Text("USA"),
+                Text("Europe"),
+                Text("Canada"),
+              ],
+            ),
           ),
-        ),
-        body: RefreshIndicator(
-          child: newsLoaded
-              ? NewsCardList(newsLoaded, newsMap)
-              : Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3.0,
-                    backgroundColor: Colors.red,
+          body: RefreshIndicator(
+            child: newsLoaded
+                ? NewsCardList(newsLoaded, newsMap)
+                : Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                      backgroundColor: Colors.red,
+                    ),
                   ),
-                ),
-          onRefresh: () {
-            print('refreshing');
-            setState(() {
+            onRefresh: () async {
+              print('refreshing');
               fetchNews();
-              print('refreshed');
-            });
-            dispose();
-            print('disposed');
-            return null;
-          },
-        ));
+              setState(() {});
+            },
+          )),
+    );
   }
 }
 
